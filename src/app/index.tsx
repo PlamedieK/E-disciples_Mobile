@@ -1,14 +1,11 @@
-import { useState } from "react";
-import { Text, View, ActivityIndicator, FlatList, TouchableOpacity } from "react-native";
+import { useEffect, useState } from "react";
+import { Text, View, ActivityIndicator, TouchableOpacity, ScrollView, Image, useColorScheme } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { handleLoginMobile, healthTest } from "../services/appelApi";
 import InputTextLabel from "./components/Input";
-
-type TableauData = {
-  id: number;
-  nom: string;
-  job: string;
-};
+import { Colors } from "@/constants/Colors";
+import { useTheme } from "@/Context/ThemeContext";
+import ToggleMode from "./components/ToggleMode";
 
 export default function Index() {
   const [ip, setIp] = useState('');
@@ -16,84 +13,146 @@ export default function Index() {
   const [password, setPassword] = useState('');
   const [isTestingLogin, setIsTestingLogin] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
-  const [tabData, setTabData] = useState<TableauData[]>([]);
+  const [loadingApp, setLoadingApp] = useState(true)
 
+  //const colorScheme = useColorScheme() // 'light' ou 'dark'
+  const {theme} = useTheme()
+
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoadingApp(false)
+    }, 5000);
+    return () => clearTimeout(timer) //Nettoyage du timer si le composant est démonté
+  }, [])
+
+  // if(loadingApp){
+  //  //1E3A8A  F8FAFC
+  // }
   return (
-    <SafeAreaView className="flex-1 items-center justify-center bg-slate-950 px-4">
-      <View className="px-6 py-6 bg-slate-900 rounded-2xl border border-slate-800 shadow-xl w-full">
-        
-        {/* Champ IP */}
-        <InputTextLabel
-          value={ip}
-          onChangeText={setIp}
-          placeholder="Ex. 192.168.1.14"
-          textLabel="Configuration IP"
-          placeholderColor="#666"
-          keyboardType="numeric"
-        />
+    <ScrollView>
+        {/* <View className="px-4 pt-2 items-end">
+        <ToggleMode />
+      </View> */}
+    <SafeAreaView style={{ backgroundColor: theme.background }} className="flex-1 top-0">
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+          className="px-5 py-6 space-y-6"
+          showsVerticalScrollIndicator={false}
+        >
 
-        {/* Champs Identifiants */}
-        <InputTextLabel
-          value={email}
-          onChangeText={setEmail}
-          placeholder="pkimpambudi@gmail.com"
-          textLabel="Email"
-          placeholderColor="#666"
-          keyboardType="email-address"
-        />
-        <InputTextLabel
-          value={password}
-          onChangeText={setPassword}
-          placeholder="*********"
-          textLabel="Mot de passe"
-          placeholderColor="#666"
-          secureTextEntry={true}
-          keyboardType={"default"}
-        />
+          {/* En-tête Tactique */}
+          <View className="items-center mb-2 space-y-1">
+            <Text style={{ color: theme.textPrimary }} className="text-2xl font-extrabold text-center tracking-tight">
+              React-Native (Mobile) & AdonisJS (Server)
+            </Text>
+          </View>
 
-        {/* Bouton Login */}
-        <View className="py-3">
-          <TouchableOpacity
-            disabled={isTestingLogin}
-            onPress={() => 
-              handleLoginMobile({
-                ip,
-                email,
-                password,
-                setIsTestingLogin,
-                onSuccess: (userData) => {
-                  console.log('Utilisateur connecté :', userData);
-                    // Ici tu pourras rediriger vers l'écran principal (ex: router.replace('/dashboard'))
-                }
-              })
-            }
-            className={`flex justify-center items-center py-3 rounded-md ${isTestingLogin ? 'bg-gray-500' : 'bg-blue-500'}`}
-          >
-            {isTestingLogin ? (
-              <ActivityIndicator size="small" color="#ffffff"/>
-            ) : (
-              <Text className="text-white font-medium">Login</Text>
-            )}
-          </TouchableOpacity>
-        </View>
+          <View className="gap-5">
+            {/* Section 1 : Configuration Serveur */}
+            <View style={{ backgroundColor: theme.formColor, borderColor: theme.border }} className="px-5 py-5 rounded-2xl border-2  shadow-xl shadow-slate-200/50">
+              <View style={{ borderColor: theme.border }} className="flex-row items-center justify-between mb-3 border-b pb-2">
+                <Text style={{ color: theme.textSecondary }} className="text-[#F8FAFC] font-extrabold text-xs tracking-widest uppercase">
+                  Configuration Réseau
+                </Text>
+                <View className="h-2.5 w-2.5 rounded-full bg-[#16A34A]" />
+              </View>
 
-        {/* Bouton Tester API */}
-        <View className="py-2">
-          <TouchableOpacity
-            onPress={() => healthTest({ ip, setIsTesting, setTabData })}
-            disabled={isTesting}
-            className={`flex justify-center items-center py-3 rounded-md ${isTesting ? 'bg-gray-500' : 'bg-emerald-500'}`}
-          >
-            {isTesting ? (
-              <ActivityIndicator size="small" color="#ffffff" />
-            ) : (
-              <Text className="text-white font-medium text-lg">Tester l'API</Text>
-            )}
-          </TouchableOpacity>
-        </View>
+              <InputTextLabel
+                value={ip}
+                onChangeText={setIp}
+                placeholder="192.168.1.14"
+                textLabel="Adresse IP Serveur"
+                placeholderColor="#94A3B8"
+                keyboardType="numeric" />
 
-        {/* Liste des données reçues */}
-        <View className="py-3 max-h-48">
+              <View className="mt-3">
+                <TouchableOpacity
+                  onPress={() => healthTest({ ip, setIsTesting })}
+                  disabled={isTesting}
+                  activeOpacity={0.8}
+                  className={`flex-row justify-center items-center py-3.5 px-4 rounded-full border ${isTesting
+                      ? `${theme.buttonDisabled} border-slate-300`
+                      : 'bg-[#16A34A] border-[#16A34A] active:bg-[#15803D]'}`}
+                >
+                  {isTesting ? (
+                    <ActivityIndicator size="small" color="#16A34A" />
+                  ) : (
+                    <Text className="text-white text-sm font-semibold tracking-wider uppercase">
+                      Tester la connexion
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Section 2 : Authentification */}
+            <View style={{ backgroundColor: theme.formColor, borderColor: theme.border }} className="px-5 py-6 rounded-2xl border-2 shadow-xl shadow-slate-200/50 space-y-2">
+              <View style={{ borderColor: theme.border }} className="flex-row items-center justify-between mb-2 border-b  pb-2">
+                <Text style={{ color: theme.textSecondary }} className="text-[#F8FAFC] font-extrabold text-xs tracking-widest uppercase">
+                  Authentification
+                </Text>
+              </View>
+
+              <InputTextLabel
+                value={email}
+                onChangeText={setEmail}
+                placeholder="pkimpambudi@gmail.com"
+                textLabel="Identifiant / Email"
+                placeholderColor="#94A3B8"
+                keyboardType="email-address" />
+
+              <InputTextLabel
+                value={password}
+                onChangeText={setPassword}
+                placeholder="•••••••••"
+                textLabel="Mot de passe"
+                placeholderColor="#94A3B8"
+                secureTextEntry={true}
+                keyboardType="default" />
+
+              <View className="pt-4">
+                <TouchableOpacity
+                  disabled={isTestingLogin}
+                  activeOpacity={0.85}
+                  onPress={() => handleLoginMobile({
+                    ip,
+                    email,
+                    password,
+                    setIsTestingLogin,
+                    onSuccess: (userData) => {
+                      console.log('Utilisateur connecté :', userData);
+                    }
+                  })}
+                  style={{ backgroundColor: theme.colorBtn, borderColor: theme.border }}
+                  className={`flex-row justify-center items-center py-4 rounded-full shadow-md ${isTestingLogin
+                      ? `${theme.buttonDisabled} border-slate-300`
+                      : `${theme.background} active:bg-[#1e293b]`}`}
+                >
+                  {isTestingLogin ? (
+                    <ActivityIndicator size="small" color="#ffffff" />
+                  ) : (
+                    <Text style={{ color: theme.textSecondary }} className="text-white font-black text-base tracking-widest uppercase">
+                      Se Connecter
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+
+          </View>
+
+        </ScrollView>
+      </SafeAreaView>
+    </ScrollView>
+  )
+}
+{/* Liste // type TableauData = {
+//   id: number;
+//   nom: string;
+//   job: string;
+// };des données reçues */ }
+        {/* <View className="py-3 max-h-48">
           {tabData && tabData.length > 0 ? (
             <FlatList
               data={tabData}
@@ -110,12 +169,7 @@ export default function Index() {
               <Text className="text-slate-500">Aucune donnée disponible</Text>
             </View>
           )}
-        </View>
-
-      </View>
-    </SafeAreaView>
-  );
-}
+        </View> */}
 // import React, { useState, useEffect } from 'react';
 // import { 
 //   StyleSheet, 
