@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
-import { Text, View, ActivityIndicator, TouchableOpacity, ScrollView, Image, useColorScheme } from "react-native";
+import { useState } from "react";
+import { Text, View, ActivityIndicator, TouchableOpacity, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { handleLoginMobile, healthTest } from "../services/appelApi";
 import InputTextLabel from "./components/Input";
-import { Colors } from "@/constants/Colors";
 import { useTheme } from "@/Context/ThemeContext";
-import ToggleMode from "./components/ToggleMode";
 
 export default function Index() {
   const [ip, setIp] = useState('');
@@ -13,27 +11,15 @@ export default function Index() {
   const [password, setPassword] = useState('');
   const [isTestingLogin, setIsTestingLogin] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
-  const [loadingApp, setLoadingApp] = useState(true)
 
   //const colorScheme = useColorScheme() // 'light' ou 'dark'
   const {theme} = useTheme()
-
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoadingApp(false)
-    }, 5000);
-    return () => clearTimeout(timer) //Nettoyage du timer si le composant est démonté
-  }, [])
 
   // if(loadingApp){
   //  //1E3A8A  F8FAFC
   // }
   return (
     <ScrollView>
-        {/* <View className="px-4 pt-2 items-end">
-        <ToggleMode />
-      </View> */}
     <SafeAreaView style={{ backgroundColor: theme.background }} className="flex-1 top-0">
         <ScrollView
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
@@ -64,14 +50,16 @@ export default function Index() {
                 placeholder="192.168.1.14"
                 textLabel="Adresse IP Serveur"
                 placeholderColor="#94A3B8"
-                keyboardType="numeric" />
+                keyboardType="numeric"
+                isPassword={false}
+              />
 
               <View className="mt-3">
                 <TouchableOpacity
                   onPress={() => healthTest({ ip, setIsTesting })}
                   disabled={isTesting}
                   activeOpacity={0.8}
-                  className={`flex-row justify-center items-center py-3.5 px-4 rounded-full border ${isTesting
+                  className={`flex-row justify-center items-center py-3.5 px-4 rounded-2xl border ${isTesting
                       ? `${theme.buttonDisabled} border-slate-300`
                       : 'bg-[#16A34A] border-[#16A34A] active:bg-[#15803D]'}`}
                 >
@@ -100,7 +88,9 @@ export default function Index() {
                 placeholder="pkimpambudi@gmail.com"
                 textLabel="Identifiant / Email"
                 placeholderColor="#94A3B8"
-                keyboardType="email-address" />
+                keyboardType="email-address"
+                isPassword={false}
+              />
 
               <InputTextLabel
                 value={password}
@@ -109,7 +99,9 @@ export default function Index() {
                 textLabel="Mot de passe"
                 placeholderColor="#94A3B8"
                 secureTextEntry={true}
-                keyboardType="default" />
+                keyboardType="default"
+                isPassword={true}
+              />
 
               <View className="pt-4">
                 <TouchableOpacity
@@ -125,7 +117,7 @@ export default function Index() {
                     }
                   })}
                   style={{ backgroundColor: theme.colorBtn, borderColor: theme.border }}
-                  className={`flex-row justify-center items-center py-4 rounded-full shadow-md ${isTestingLogin
+                  className={`flex-row justify-center items-center py-4 rounded-2xl shadow-md ${isTestingLogin
                       ? `${theme.buttonDisabled} border-slate-300`
                       : `${theme.background} active:bg-[#1e293b]`}`}
                 >

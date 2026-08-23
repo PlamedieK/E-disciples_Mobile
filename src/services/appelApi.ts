@@ -20,7 +20,7 @@ type TypeLogin = {
 export const healthTest = async ({ ip, setIsTesting }: healthTestProps) => {
     const cleanIp = ip.trim()
     if (!cleanIp) {
-      Alert.alert('Attention', 'Veuillez saisir une adresse IP valide.')
+      Alert.alert('Attention ⚠️', 'Veuillez saisir une adresse IP valide.')
       return
     }
 
@@ -69,7 +69,7 @@ export const healthTest = async ({ ip, setIsTesting }: healthTestProps) => {
 export const handleLoginMobile = async ({ ip, email, password, onSuccess, prenom, setIsTestingLogin }: TypeLogin) => {
  // const cleanIp = ip.trim()
   if (!ip || !email || !password) {
-    alert('Veuillez remplir tous les champs');
+    Alert.alert('Attention ⚠️','Veuillez remplir tous les champs');
     return;
   }
   setIsTestingLogin(true)

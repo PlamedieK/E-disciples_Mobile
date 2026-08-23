@@ -6,6 +6,7 @@ import ToggleMode from "./components/ToggleMode";
 import { ActivityIndicator, View, Text, Image, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
+import { TabsHost } from "react-native-screens/lib/typescript/components/tabs/host";
 
 
 
@@ -31,7 +32,7 @@ export  function RootLayoutContent() {
                   color={'#1E3A8A'}
                   className="mt-4"
                 />
-                <Text className="text-[#1E3A8A] mt-2 font-mono text-xs font-semibold">[ INITIALISATION... ]</Text>
+                <Text style={{ color: theme.textSecondary }} className="mt-2 font-mono text-xs font-semibold">[ CHARGEMENT... ]</Text>
         </View>
     )
   }
