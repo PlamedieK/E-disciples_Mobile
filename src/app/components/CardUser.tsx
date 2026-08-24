@@ -9,14 +9,15 @@ export const CardUser = () => {
   const { theme } = useTheme()
 
   // Génère les initiales si aucune photo de profil n'est fournie
-const getInitials = (name?: string) => {
-if (!name) return 'U'
-return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .substring(0, 2)
-    .toUpperCase()
+    const getInitials = (name?: string, prenom?: string) => {
+    const fullName = `${prenom} ${name || ''}`.trim()
+    if (!fullName) return 'U'
+    return fullName
+        .split(/\s+/) // Découpage robuste gérant plusieurs espaces
+        .map((n) => n[0])
+        .join('')
+        .substring(0, 2)
+        .toUpperCase()
 }
 
 return (
@@ -33,7 +34,7 @@ return (
 
         <View className="w-14 h-14 rounded-2xl bg-blue-600/20 border-2 border-blue-500/30 items-center justify-center">
             <Text className="text-blue-500 text-lg font-bold">
-            {getInitials(user?.nom)}
+            {getInitials(user?.nom, user?.prenom)}
             </Text>
         </View>
         {/* Badge statut connecté */}
