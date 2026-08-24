@@ -115,13 +115,18 @@ export default function Index() {
                     email,
                     password,
                     setIsTestingLogin,
-                    onSuccess: (userData, serverIp) => {
-                      console.log('Utilisateur connecté :', userData);
-                      console.log('Adresse IP :', serverIp);
-                      // Mettre à jour le Context Global
-                      setUser(userData);
-                      if (setip) setip(serverIp); // Appel du setter du Context (setip)
-                      router.push('/components/pages/Home');
+                    onSuccess: (responseData, serverIp) => {
+                      console.log('Utilisateur connecté :', responseData); 
+                      // ✅ Extraction propre de l'utilisateur et du token
+                      const userObj = responseData.user || responseData;
+                      const tokenStr = responseData.token || userObj.token;
+                      setUser({
+                        ...userObj,
+                        token: tokenStr // ✅ Affectation directe de la string du token
+                      });
+                      if (setip) setip(serverIp);
+                      // ✅ Utiliser replace au lieu de push pour réinitialiser la pile de navigation
+                      router.replace('/components/pages/Home');
                     }
                   })}
                   style={{ backgroundColor: theme.colorBtn, borderColor: theme.border }}

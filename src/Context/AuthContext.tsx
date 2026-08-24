@@ -19,6 +19,7 @@ export type User = {
     phone: string,
     dateBaptem: string,
     role: UserRole,
+    token: string 
 }
 // Remplacement du type IpType par un simple string
 type AuthContextType = {
@@ -27,17 +28,18 @@ type AuthContextType = {
     ip: string | null                      // Objet simplifié en string
     setip: (ip: string | null) => void    // Retrait du '?' facultatif
     logOut: () => void
+    token: string | null
 }
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null)
     const [ip, setip] = useState<string | null>(null)
+    const token = user?.token || null
     const logOut = () => {
         Alert.alert('Avertissement ⚠️', 'Voulez-vous vous déconnecter ? ', [
             {
                 text: 'Oui', 
                 onPress: () => router.push('/'),
-                
                 //return  ()  =>  setUser(null),
             },
             {
@@ -47,7 +49,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         ])
     }
 return (
-    <AuthContext.Provider value={{ user, setUser, logOut, ip, setip }}>
+    <AuthContext.Provider value={{ user, setUser, logOut, ip, setip, token }}>
         {children}
       {/* <Text>AuthContext</Text> */}
     </AuthContext.Provider>

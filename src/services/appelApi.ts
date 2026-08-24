@@ -1,5 +1,6 @@
 import { Alert } from "react-native"
 import * as SecureStore from 'expo-secure-store'
+import { useAuth } from "@/Context/AuthContext"
 type healthTestProps = {
     ip: string
     setIsTesting: (test: boolean) => void
@@ -18,7 +19,7 @@ type TypeLogin = {
 
 
 export const healthTest = async ({ ip, setIsTesting }: healthTestProps) => {
-    const cleanIp = ip.trim()
+  const cleanIp = ip.trim()
     if (!cleanIp) {
       Alert.alert('Attention ⚠️', 'Veuillez saisir une adresse IP valide.')
       return
@@ -47,7 +48,8 @@ export const healthTest = async ({ ip, setIsTesting }: healthTestProps) => {
           `Connexion établie avec succès !
           \nMessage du serveur : ${data.message}`)
       } else {
-      Alert.alert('Erreur',  'Réponse inattendue du serveur.')
+        Alert.alert('Erreur', 'Réponse inattendue du serveur.')
+       // console.log('hlkl', url)
 
       }
 
@@ -103,45 +105,69 @@ export const handleLoginMobile = async ({ ip, email, password, onSuccess, prenom
     alert(`Connexion réussie ! ${data.user!.nom!}-${data.user!.prenom!} 🎉`);
     onSuccess(data.user, ip);
   } catch (error: any) {
-    // Affichage détaillé de l'erreur dans la console Metro
-   // console.error('[Login Error Details] :', error);
     Alert.alert(error.message || 'Attention ⚠️',  'Impossible de joindre le serveur');
   } finally {
     setIsTestingLogin(false);
   }
 }
-
-interface ActivitiesType {
+export interface ActivitiesType {
   id: number
   activity: string
   isOpen: boolean
 }
+
 type LoadActivitiesProps = {
- setActivities: (tab: ActivitiesType[]) => void
+  setActivities: (tab: ActivitiesType[]) => void
+  ip: string | null
+  token?: string | null
 } 
-export const loadActivities = async ({ setActivities }: LoadActivitiesProps) => {
- try {
-  //const res = await fetch()
- } catch (error) {
+export const loadActivities = async ({ setActivities, ip, token }: LoadActivitiesProps) => {
+  if (!ip) {
+    Alert.alert('Attention ⚠️', "L'adresse IP du serveur est introuvable")
+    return
+  }
+
+  const apis = `http://${ip.trim()}:3333/api/activities-api`
   
- }
+  // Correction 1 : retrait du '+' dans le console.log
+  console.log('URL de API :', apis)
+
+  try {
+    const ctlr = new AbortController()
+    const timeoutId = setTimeout(() => ctlr.abort(), 3000)
+
+    const res = await fetch(apis, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        // Ajout du token d'authentification Bearer
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      },
+      signal: ctlr.signal,
+    })
+
+    clearTimeout(timeoutId)
+
+    if (!res.ok) {
+      if (res.status === 401) {
+        throw new Error("Session expirée ou non autorisée (401)")
+      }
+      throw new Error(`Erreur serveur HTTP ${res.status}`)
+    }
+    const data = await res.json()
+    // Correction 2 : pour afficher un objet ou tableau JSON dans la console
+    console.log('Les activités :', JSON.stringify(data, null, 2))
+
+    // Mise à jour du state avec les données reçues
+    setActivities(data)
+
+  } catch (error: any) {
+    Alert.alert('Attention ⚠️', error.message || 'Impossible de charger les activités du serveur')
+  } 
+  // Correction 3 : suppression de `finally { setActivities([]) }` 
+  // pour éviter d'effacer immédiatement les données qui viennent d'être chargées.
 }
-
-// export type UserData = {
-//   id?: number
-//   email: string
-//   nom?: string
-//   prenom?: string
-// }
-
-// type LoginParams = {
-//   ip: string
-//   email: string
-//   password: string
-//   setIsTestingLogin: (loading: boolean) => void
-//   onSuccess: (user: UserData) => void
-// }
-
 // export const handleLoginMobile = async ({
 //   ip,
 //   email,
@@ -156,18 +182,9 @@ export const loadActivities = async ({ setActivities }: LoadActivitiesProps) => 
 //     )
 //     return
 //   }
-
 //   setIsTestingLogin(true)
-
 //   const url = `http://${ip.trim()}:3333/api/api-login`
-
 //   try {
-//     console.log('================================')
-//     console.log('🔐 LOGIN MOBILE')
-//     console.log('URL:', url)
-//     console.log('EMAIL:', email)
-//     console.log('================================')
-
 //     const response = await fetch(url, {
 //       method: 'POST',
 //       headers: {

@@ -1,14 +1,18 @@
-import { View, Text, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, TouchableOpacity, FlatList } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { useAuth } from '@/Context/AuthContext'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTheme } from '@/Context/ThemeContext'
+import { ActivitiesType, loadActivities } from '@/services/appelApi'
 
 const Home = () => {
-const { user, logOut, ip } = useAuth()
+    const { user, logOut, ip, token } = useAuth()
 const [bascul, setIsBascul] = useState(true)
 const { theme } = useTheme()
-
+const [tabActivities, setTabActivities] = useState<ActivitiesType[]>([])
+useEffect(() => {
+        loadActivities({setActivities: setTabActivities, ip, token})
+}, [ip, token])
 return (
 <SafeAreaView 
     style={{ backgroundColor: theme.background }} 
@@ -29,7 +33,25 @@ return (
         Rôle : <Text className="font-semibold">{user?.role || 'Non défini'}</Text>
     </Text>
     </View>
-
+        {
+            tabActivities ? (
+                <>
+                    <FlatList
+                    data={tabActivities}
+                        renderItem={({ item }) =>
+                            <View>
+                                <Text> {item.activity} </Text>
+                            </View>
+                        }
+                    keyExtractor={item => item.id.toString()}
+                    />
+                </>
+            ) : (
+                <View>
+                <Text> Vide </Text>
+            </View>
+            )
+    }
       {/* Exemple de bouton d'action / Bascule */}
     {/* <TouchableOpacity 
     activeOpacity={0.8}
@@ -42,7 +64,8 @@ return (
     </Text>
     </TouchableOpacity> */}
 
-      {/* Bouton de Déconnexion */}
+        {/* Bouton de Déconnexion */}
+    
     <TouchableOpacity 
     activeOpacity={0.8}
             onPress={logOut}
