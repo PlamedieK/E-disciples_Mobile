@@ -54,7 +54,7 @@ const InputTextLabel = ({ textLabel, value, onChangeText, secureTextEntry = fals
                 <TouchableOpacity
                     activeOpacity={0.7}
                     onPress={() => setIsHidePassword(!isHidePassword)}
-                    className="absolute right-4 p-1 "
+                    className="right-4 p-1 "
                     >
                         <Text style={{color: theme.textPrimary, textDecorationLine: 'underline'}} className={`text-sm underline mx-3`}>
                             {isHidePassword ? 'Voir le mot de password' : 'Cacher le mot de password'}

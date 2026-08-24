@@ -12,7 +12,7 @@ type TypeLogin = {
   password: string,
   prenom?: string,
   setIsTestingLogin: (load: boolean) => void
-  onSuccess: (user: any) => void
+  onSuccess: (user: any, ip: any) => void
 }
 
 
@@ -101,17 +101,31 @@ export const handleLoginMobile = async ({ ip, email, password, onSuccess, prenom
     await SecureStore.setItemAsync('user_token', data.token);
 
     alert(`Connexion réussie ! ${data.user!.nom!}-${data.user!.prenom!} 🎉`);
-    onSuccess(data.user);
+    onSuccess(data.user, ip);
   } catch (error: any) {
     // Affichage détaillé de l'erreur dans la console Metro
    // console.error('[Login Error Details] :', error);
-    alert(error.message || 'Impossible de joindre le serveur');
+    Alert.alert(error.message || 'Attention ⚠️',  'Impossible de joindre le serveur');
   } finally {
     setIsTestingLogin(false);
   }
 }
 
-
+interface ActivitiesType {
+  id: number
+  activity: string
+  isOpen: boolean
+}
+type LoadActivitiesProps = {
+ setActivities: (tab: ActivitiesType[]) => void
+} 
+export const loadActivities = async ({ setActivities }: LoadActivitiesProps) => {
+ try {
+  //const res = await fetch()
+ } catch (error) {
+  
+ }
+}
 
 // export type UserData = {
 //   id?: number

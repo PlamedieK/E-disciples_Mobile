@@ -4,6 +4,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { handleLoginMobile, healthTest } from "../services/appelApi";
 import InputTextLabel from "./components/Input";
 import { useTheme } from "@/Context/ThemeContext";
+import { router } from "expo-router";
+import { useAuth } from "@/Context/AuthContext";
 
 export default function Index() {
   const [ip, setIp] = useState('');
@@ -13,7 +15,8 @@ export default function Index() {
   const [isTesting, setIsTesting] = useState(false);
 
   //const colorScheme = useColorScheme() // 'light' ou 'dark'
-  const {theme} = useTheme()
+  const { theme } = useTheme()
+  const { setUser, setip } = useAuth()
 
   // if(loadingApp){
   //  //1E3A8A  F8FAFC
@@ -112,8 +115,13 @@ export default function Index() {
                     email,
                     password,
                     setIsTestingLogin,
-                    onSuccess: (userData) => {
+                    onSuccess: (userData, serverIp) => {
                       console.log('Utilisateur connecté :', userData);
+                      console.log('Adresse IP :', serverIp);
+                      // Mettre à jour le Context Global
+                      setUser(userData);
+                      if (setip) setip(serverIp); // Appel du setter du Context (setip)
+                      router.push('/components/pages/Home');
                     }
                   })}
                   style={{ backgroundColor: theme.colorBtn, borderColor: theme.border }}

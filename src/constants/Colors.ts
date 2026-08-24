@@ -20,7 +20,8 @@ export const Colors = {
       placeholder: '#94A3B8',
       buttonDisabled: '#E2E8F0',
       colorBtn: '#1E3A8A',
-      radioBtn: '#1E293B'
+      radioBtn: '#1E293B',
+      btnLogout: '#ff431f',
     },
   
     // Mode Sombre (Dark)
@@ -35,6 +36,7 @@ export const Colors = {
       placeholder: '#64748B',
       buttonDisabled: '#334155',
       colorBtn: '#1E293B',
-      radioBtn: '#F8FAFC'
+      radioBtn: '#F8FAFC',
+      btnLogout: '#ff431f',
     },
   };

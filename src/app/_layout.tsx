@@ -7,12 +7,14 @@ import { ActivityIndicator, View, Text, Image, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
 import { TabsHost } from "react-native-screens/lib/typescript/components/tabs/host";
+import AuthProvider, { useAuth } from "@/Context/AuthContext";
 
 
 
 export  function RootLayoutContent() {
   const { theme, isDark } = useTheme()
   const [isLoading, setIsLoading] = useState(true)
+  const {  user, setUser } = useAuth()
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false)
@@ -50,7 +52,12 @@ export  function RootLayoutContent() {
         headerRight: () => <ToggleMode />, // Place le Toggle à l'extrême gauche
       }} 
       >
-      <Stack.Screen name="index" options={{ title: '' }} />
+        <Stack.Screen name="index" options={{ title: '' }} />
+        {
+          user && (
+            <Stack.Screen name="components/pages/Home" options={{ title: '' }} />
+          )
+        }
       </Stack>
     </View>
   );
@@ -58,8 +65,10 @@ export  function RootLayoutContent() {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider> 
-      <RootLayoutContent />
-    </ThemeProvider>
+    <AuthProvider> 
+        <ThemeProvider> 
+          <RootLayoutContent />
+        </ThemeProvider>
+    </AuthProvider> 
   );
 }
