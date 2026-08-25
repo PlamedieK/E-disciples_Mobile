@@ -1,6 +1,7 @@
 import { Alert } from "react-native"
 import * as SecureStore from 'expo-secure-store'
 import { useAuth } from "@/Context/AuthContext"
+import { jsx } from "react/jsx-runtime"
 type healthTestProps = {
     ip: string
     setIsTesting: (test: boolean) => void
@@ -16,22 +17,18 @@ type TypeLogin = {
   onSuccess: (user: any, ip: any) => void
 }
 
-
-
 export const healthTest = async ({ ip, setIsTesting }: healthTestProps) => {
   const cleanIp = ip.trim()
     if (!cleanIp) {
       Alert.alert('Attention ⚠️', 'Veuillez saisir une adresse IP valide.')
       return
     }
-
     setIsTesting(true)
     const url = `http://${cleanIp}:3333/api/testApi`
     try {
       // Configuration d'une limite de temps (Timeout) à 6 secondes
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 6000)
-      
       const res = await fetch(url, {
         method: 'GET', 
         headers: {
@@ -126,16 +123,10 @@ export const loadActivities = async ({ setActivities, ip, token }: LoadActivitie
     Alert.alert('Attention ⚠️', "L'adresse IP du serveur est introuvable")
     return
   }
-
   const apis = `http://${ip.trim()}:3333/api/activities-api`
-  
-  // Correction 1 : retrait du '+' dans le console.log
-  console.log('URL de API :', apis)
-
   try {
     const ctlr = new AbortController()
     const timeoutId = setTimeout(() => ctlr.abort(), 3000)
-
     const res = await fetch(apis, {
       method: 'GET',
       headers: {
@@ -146,9 +137,7 @@ export const loadActivities = async ({ setActivities, ip, token }: LoadActivitie
       },
       signal: ctlr.signal,
     })
-
     clearTimeout(timeoutId)
-
     if (!res.ok) {
       if (res.status === 401) {
         throw new Error("Session expirée ou non autorisée (401)")
@@ -158,16 +147,60 @@ export const loadActivities = async ({ setActivities, ip, token }: LoadActivitie
     const data = await res.json()
     // Correction 2 : pour afficher un objet ou tableau JSON dans la console
     console.log('Les activités :', JSON.stringify(data, null, 2))
-
     // Mise à jour du state avec les données reçues
     setActivities(data)
-
   } catch (error: any) {
     Alert.alert('Attention ⚠️', error.message || 'Impossible de charger les activités du serveur')
   } 
-  // Correction 3 : suppression de `finally { setActivities([]) }` 
-  // pour éviter d'effacer immédiatement les données qui viennent d'être chargées.
 }
+
+type searhPartageBibliqueType = {
+  searchQuery: string
+  setNameDb?: (name: any) => void
+  value?: string | number 
+  setIsLoading: (name: boolean) => void
+  setResultatQuery: (tab: any) => void
+  ip: string | null
+  token?: string | null
+} 
+export const searhPartageBiblique = async ({ searchQuery, setIsLoading, setResultatQuery, ip, token }: searhPartageBibliqueType) => {
+  setResultatQuery(searchQuery)
+  if (searchQuery.length < 2) return setResultatQuery([])
+    setIsLoading(true)
+  const url = `http://${ip}:3333/api/search-db?q=${encodeURIComponent(searchQuery)}`
+  try {
+    const ctlr = new AbortController();
+    const timeoutId = setTimeout(() => ctlr.abort(), 6000)
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        ...( token ? { 'Authorization': `Bearer ${token} `} : {})
+      },
+      // body: JSON.stringify({
+      //   q: searchQuery
+      // }),
+      signal: ctlr.signal
+    })
+    clearTimeout(timeoutId)
+    if (!res.ok) {
+      if (res.status === 401) {
+        throw new Error("Session expirée ou non autorisée (401)");
+      }
+      throw new Error(`Erreur du server HTTP ${res.status}`);
+    }
+    const data = await res.json()
+    console.log('Les partages bibliques', JSON.stringify(data, null, 2))
+    setResultatQuery(data)
+  } catch (error: any) {
+    Alert.alert('Attention ⚠️', error.message || 'Impossible de charger les DBs du serveur')
+  } finally {
+    setIsLoading(false)
+  }
+}
+
+
 // export const handleLoginMobile = async ({
 //   ip,
 //   email,

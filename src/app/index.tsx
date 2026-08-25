@@ -1,163 +1,216 @@
+import { useAuth } from "@/Context/AuthContext";
+import { useTheme } from "@/Context/ThemeContext";
+import { router } from "expo-router";
 import { useState } from "react";
-import { Text, View, ActivityIndicator, TouchableOpacity, ScrollView } from "react-native";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { handleLoginMobile, healthTest } from "../services/appelApi";
 import InputTextLabel from "./components/Input";
-import { useTheme } from "@/Context/ThemeContext";
-import { router } from "expo-router";
-import { useAuth } from "@/Context/AuthContext";
 
 export default function Index() {
-  const [ip, setIp] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [ip, setIp] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isTestingLogin, setIsTestingLogin] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
 
   //const colorScheme = useColorScheme() // 'light' ou 'dark'
-  const { theme } = useTheme()
-  const { setUser, setip } = useAuth()
+  const { theme } = useTheme();
+  const { setUser, setip } = useAuth();
 
   // if(loadingApp){
   //  //1E3A8A  F8FAFC
   // }
   return (
     <ScrollView>
-    <SafeAreaView style={{ backgroundColor: theme.background }} className="flex-1 top-0">
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
-          className="px-5 py-6 space-y-6"
-          showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        className="flex-1"
+      >
+        <SafeAreaView
+          style={{ backgroundColor: theme.background }}
+          className="flex-1 top-0"
         >
-
-          {/* En-tête Tactique */}
-          <View className="items-center mb-2 space-y-1">
-            <Text style={{ color: theme.textPrimary }} className="text-2xl font-extrabold text-center tracking-tight">
-              React-Native (Mobile) & AdonisJS (Server)
-            </Text>
-          </View>
-
-          <View className="gap-5">
-            {/* Section 1 : Configuration Serveur */}
-            <View style={{ backgroundColor: theme.formColor, borderColor: theme.border }} className="px-5 py-5 rounded-2xl border-2  shadow-xl shadow-slate-200/50">
-              <View style={{ borderColor: theme.border }} className="flex-row items-center justify-between mb-3 border-b pb-2">
-                <Text style={{ color: theme.textSecondary }} className="text-[#F8FAFC] font-extrabold text-xs tracking-widest uppercase">
-                  Configuration Réseau
-                </Text>
-                <View className="h-2.5 w-2.5 rounded-full bg-[#16A34A]" />
-              </View>
-
-              <InputTextLabel
-                value={ip}
-                onChangeText={setIp}
-                placeholder="192.168.1.14"
-                textLabel="Adresse IP Serveur"
-                placeholderColor="#94A3B8"
-                keyboardType="numeric"
-                isPassword={false}
-              />
-
-              <View className="mt-3">
-                <TouchableOpacity
-                  onPress={() => healthTest({ ip, setIsTesting })}
-                  disabled={isTesting}
-                  activeOpacity={0.8}
-                  className={`flex-row justify-center items-center py-3.5 px-4 rounded-2xl border ${isTesting
-                      ? `${theme.buttonDisabled} border-slate-300`
-                      : 'bg-[#16A34A] border-[#16A34A] active:bg-[#15803D]'}`}
-                >
-                  {isTesting ? (
-                    <ActivityIndicator size="small" color="#16A34A" />
-                  ) : (
-                    <Text className="text-white text-sm font-semibold tracking-wider uppercase">
-                      Tester la connexion
-                    </Text>
-                  )}
-                </TouchableOpacity>
-              </View>
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+            className="px-5 py-6 space-y-6"
+            showsVerticalScrollIndicator={false}
+          >
+            {/* En-tête Tactique */}
+            <View className="items-center mb-2 space-y-1">
+              <Text
+                style={{ color: theme.textPrimary }}
+                className="text-2xl font-extrabold text-center tracking-tight"
+              >
+                React-Native (Mobile) & AdonisJS (Server)
+              </Text>
             </View>
 
-            {/* Section 2 : Authentification */}
-            <View style={{ backgroundColor: theme.formColor, borderColor: theme.border }} className="px-5 py-6 rounded-2xl border-2 shadow-xl shadow-slate-200/50 space-y-2">
-              <View style={{ borderColor: theme.border }} className="flex-row items-center justify-between mb-2 border-b  pb-2">
-                <Text style={{ color: theme.textSecondary }} className="text-[#F8FAFC] font-extrabold text-xs tracking-widest uppercase">
-                  Authentification
-                </Text>
-              </View>
+            <View className="gap-5">
+              {/* Section 1 : Configuration Serveur */}
+              <View
+                style={{
+                  backgroundColor: theme.formColor,
+                  borderColor: theme.border,
+                }}
+                className="px-5 py-5 rounded-2xl border-2  shadow-xl shadow-slate-200/50"
+              >
+                <View
+                  style={{ borderColor: theme.border }}
+                  className="flex-row items-center justify-between mb-3 border-b pb-2"
+                >
+                  <Text
+                    style={{ color: theme.textSecondary }}
+                    className="text-[#F8FAFC] font-extrabold text-xs tracking-widest uppercase"
+                  >
+                    Configuration Réseau
+                  </Text>
+                  <View className="h-2.5 w-2.5 rounded-full bg-[#16A34A]" />
+                </View>
 
-              <InputTextLabel
-                value={email}
-                onChangeText={setEmail}
-                placeholder="pkimpambudi@gmail.com"
-                textLabel="Identifiant / Email"
-                placeholderColor="#94A3B8"
-                keyboardType="email-address"
-                isPassword={false}
-              />
+                <InputTextLabel
+                  value={ip}
+                  onChangeText={setIp}
+                  placeholder="192.168.1.14"
+                  textLabel="Adresse IP Serveur"
+                  placeholderColor="#94A3B8"
+                  keyboardType="numeric"
+                  isPassword={false}
+                />
 
-              <InputTextLabel
-                value={password}
-                onChangeText={setPassword}
-                placeholder="•••••••••"
-                textLabel="Mot de passe"
-                placeholderColor="#94A3B8"
-                secureTextEntry={true}
-                keyboardType="default"
-                isPassword={true}
-              />
-
-              <View className="pt-4">
-                <TouchableOpacity
-                  disabled={isTestingLogin}
-                  activeOpacity={0.85}
-                  onPress={() => handleLoginMobile({
-                    ip,
-                    email,
-                    password,
-                    setIsTestingLogin,
-                    onSuccess: (responseData, serverIp) => {
-                      console.log('Utilisateur connecté :', responseData); 
-                      // ✅ Extraction propre de l'utilisateur et du token
-                      const userObj = responseData.user || responseData;
-                      const tokenStr = responseData.token || userObj.token;
-                      setUser({
-                        ...userObj,
-                        token: tokenStr // ✅ Affectation directe de la string du token
-                      });
-                      if (setip) setip(serverIp);
-                      // ✅ Utiliser replace au lieu de push pour réinitialiser la pile de navigation
-                      router.replace('/components/pages/Home');
+                <View className="mt-3">
+                  <TouchableOpacity
+                    onPress={() => healthTest({ ip, setIsTesting })}
+                    disabled={isTesting}
+                    activeOpacity={0.8}
+                    className={`flex-row justify-center items-center py-3.5 px-4 rounded-2xl border ${
+                      isTesting ?
+                        `${theme.buttonDisabled} border-slate-300`
+                      : "bg-[#16A34A] border-[#16A34A] active:bg-[#15803D]"
+                    }`}
+                  >
+                    {isTesting ?
+                      <ActivityIndicator size="small" color="#16A34A" />
+                    : <Text className="text-white text-sm font-semibold tracking-wider uppercase">
+                        Tester la connexion
+                      </Text>
                     }
-                  })}
-                  style={{ backgroundColor: theme.colorBtn, borderColor: theme.border }}
-                  className={`flex-row justify-center items-center py-4 rounded-2xl shadow-md ${isTestingLogin
-                      ? `${theme.buttonDisabled} border-slate-300`
-                      : `${theme.background} active:bg-[#1e293b]`}`}
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* Section 2 : Authentification */}
+              <View
+                style={{
+                  backgroundColor: theme.formColor,
+                  borderColor: theme.border,
+                }}
+                className="px-5 py-6 rounded-2xl border-2 shadow-xl shadow-slate-200/50 space-y-2"
+              >
+                <View
+                  style={{ borderColor: theme.border }}
+                  className="flex-row items-center justify-between mb-2 border-b  pb-2"
                 >
-                  {isTestingLogin ? (
-                    <ActivityIndicator size="small" color="#ffffff" />
-                  ) : (
-                    <Text style={{ color: theme.textSecondary }} className="text-white font-black text-base tracking-widest uppercase">
-                      Se Connecter
-                    </Text>
-                  )}
-                </TouchableOpacity>
+                  <Text
+                    style={{ color: theme.textSecondary }}
+                    className="text-[#F8FAFC] font-extrabold text-xs tracking-widest uppercase"
+                  >
+                    Authentification
+                  </Text>
+                </View>
+
+                <InputTextLabel
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="pkimpambudi@gmail.com"
+                  textLabel="Identifiant / Email"
+                  placeholderColor="#94A3B8"
+                  keyboardType="email-address"
+                  isPassword={false}
+                />
+
+                <InputTextLabel
+                  value={password}
+                  onChangeText={setPassword}
+                  placeholder="•••••••••"
+                  textLabel="Mot de passe"
+                  placeholderColor="#94A3B8"
+                  secureTextEntry={true}
+                  keyboardType="default"
+                  isPassword={true}
+                />
+
+                <View className="pt-4">
+                  <TouchableOpacity
+                    disabled={isTestingLogin}
+                    activeOpacity={0.85}
+                    onPress={() =>
+                      handleLoginMobile({
+                        ip,
+                        email,
+                        password,
+                        setIsTestingLogin,
+                        onSuccess: (responseData, serverIp) => {
+                          console.log("Utilisateur connecté :", responseData);
+                          // ✅ Extraction propre de l'utilisateur et du token
+                          const userObj = responseData.user || responseData;
+                          const tokenStr = responseData.token || userObj.token;
+                          setUser({
+                            ...userObj,
+                            token: tokenStr, // ✅ Affectation directe de la string du token
+                          });
+                          if (setip) setip(serverIp);
+                          // ✅ Utiliser replace au lieu de push pour réinitialiser la pile de navigation
+                          router.replace("/components/pages/Home");
+                        },
+                      })
+                    }
+                    style={{
+                      backgroundColor: theme.colorBtn,
+                      borderColor: theme.border,
+                    }}
+                    className={`flex-row justify-center items-center py-4 rounded-2xl shadow-md ${
+                      isTestingLogin ?
+                        `${theme.buttonDisabled} border-slate-300`
+                      : `${theme.background} active:bg-[#1e293b]`
+                    }`}
+                  >
+                    {isTestingLogin ?
+                      <ActivityIndicator size="small" color="#ffffff" />
+                    : <Text
+                        style={{ color: theme.textSecondary }}
+                        className="text-white font-black text-base tracking-widest uppercase"
+                      >
+                        Se Connecter
+                      </Text>
+                    }
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-
-          </View>
-
-        </ScrollView>
-      </SafeAreaView>
+          </ScrollView>
+        </SafeAreaView>
+      </KeyboardAvoidingView>
     </ScrollView>
-  )
+  );
 }
-{/* Liste // type TableauData = {
+{
+  /* Liste // type TableauData = {
 //   id: number;
 //   nom: string;
 //   job: string;
-// };des données reçues */ }
-        {/* <View className="py-3 max-h-48">
+// };des données reçues */
+}
+{
+  /* <View className="py-3 max-h-48">
           {tabData && tabData.length > 0 ? (
             <FlatList
               data={tabData}
@@ -174,17 +227,18 @@ export default function Index() {
               <Text className="text-slate-500">Aucune donnée disponible</Text>
             </View>
           )}
-        </View> */}
+        </View> */
+}
 // import React, { useState, useEffect } from 'react';
-// import { 
-//   StyleSheet, 
-//   Text, 
-//   TextInput, 
-//   View, 
-//   TouchableOpacity, 
-//   ActivityIndicator, 
-//   Alert, 
-//   SafeAreaView 
+// import {
+//   StyleSheet,
+//   Text,
+//   TextInput,
+//   View,
+//   TouchableOpacity,
+//   ActivityIndicator,
+//   Alert,
+//   SafeAreaView
 // } from 'react-native';
 // //import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -246,9 +300,9 @@ export default function Index() {
 //   //     if (data && data.status === 'connected') {
 //   //       // Sauvegarde de l'IP réussie dans le téléphone
 //   //       await AsyncStorage.setItem('@adonis_backend_ip', cleanIp);
-        
+
 //   //       Alert.alert(
-//   //         'Succès 🎉', 
+//   //         'Succès 🎉',
 //   //         `Connexion établie avec succès !\n\nMessage du serveur : ${data.message}`
 //   //       );
 //   //     } else {
@@ -291,8 +345,8 @@ export default function Index() {
 //           autoCapitalize="none"
 //         />
 
-//         <TouchableOpacity 
-//           style={[styles.button, isTesting && styles.buttonDisabled]} 
+//         <TouchableOpacity
+//           style={[styles.button, isTesting && styles.buttonDisabled]}
 //          // onPress={handleTestConnection}
 //           disabled={isTesting}
 //         >

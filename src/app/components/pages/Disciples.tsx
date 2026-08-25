@@ -1,15 +1,33 @@
-import React, { useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import Ionicons from '@react-native-vector-icons/ionicons'
-import { useTheme } from '@/Context/ThemeContext'
-import { router } from 'expo-router'
-import FormDisciples from '../modals/FormDisciples'
+import { useAuth } from "@/Context/AuthContext";
+import { useTheme } from "@/Context/ThemeContext";
+import { searhPartageBiblique } from "@/services/appelApi";
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import FormDisciples from "../modals/FormDisciples";
 
 const Disciples = () => {
-  const { theme } = useTheme()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [modalVisible, setModalVisible] = useState(false)
+  const { theme } = useTheme();
+  const { ip, token } = useAuth();
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [resultatQuery, setResultatQuery] = useState<any[] | null>([]);
+
+  useEffect(() => {
+    // useMemo(() => {
+    //     searhPartageBiblique({searchQuery, setIsLoading, setResultatQuery, ip, token})
+    // }, [searchQuery, setIsLoading, setResultatQuery, ip, token])
+    searhPartageBiblique({
+      searchQuery,
+      setIsLoading,
+      setResultatQuery,
+      ip,
+      token,
+    });
+  }, [searchQuery, setIsLoading, setResultatQuery, ip, token]);
 
   return (
     <SafeAreaView
@@ -24,7 +42,7 @@ const Disciples = () => {
             // style={{ backgroundColor: theme.background, borderColor: theme.border }}
             className="w-10 h-10 rounded-xl items-center justify-center border bg-blue-600"
           >
-            <Ionicons name="arrow-back" size={20} color={'#FFF'} />
+            <Ionicons name="arrow-back" size={20} color={"#FFF"} />
           </TouchableOpacity>
           <Text
             style={{ color: theme.textPrimary }}
@@ -47,8 +65,8 @@ const Disciples = () => {
       {/* Barre de Recherche */}
       <View
         style={{
-          backgroundColor: theme.formColor || '#0F172A',
-          borderColor: theme.border || '#1E293B',
+          backgroundColor: theme.formColor || "#0F172A",
+          borderColor: theme.border || "#1E293B",
         }}
         className="flex-row items-center h-14 px-4 rounded-2xl border-2 mb-4"
       >
@@ -62,7 +80,7 @@ const Disciples = () => {
           className="flex-1 ml-3 text-base font-medium"
         />
         {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery('')}>
+          <TouchableOpacity onPress={() => setSearchQuery("")}>
             <Ionicons name="close-circle" size={20} color="#64748B" />
           </TouchableOpacity>
         )}
@@ -74,7 +92,7 @@ const Disciples = () => {
         setModalVisible={setModalVisible}
       />
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default Disciples
+export default Disciples;
