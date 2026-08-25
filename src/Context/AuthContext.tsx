@@ -19,7 +19,8 @@ export type User = {
     phone: string,
     dateBaptem: string,
     role: UserRole,
-    token: string 
+    token: string
+    nomDb: string,
 }
 // Remplacement du type IpType par un simple string
 type AuthContextType = {

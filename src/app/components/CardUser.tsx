@@ -32,7 +32,7 @@ return (
     {/* Avatar avec Badge en ligne */}
     <View className="relative">
 
-        <View className="w-14 h-14 rounded-2xl bg-blue-600/20 border-2 border-blue-500/30 items-center justify-center">
+        <View className="w-24 h-24 rounded-3xl bg-blue-600/20 border-2 border-blue-500/30 items-center justify-center">
             <Text className="text-blue-500 text-lg font-bold">
             {getInitials(user?.nom, user?.prenom)}
             </Text>
@@ -43,15 +43,21 @@ return (
         className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2"
         />
     </View>
+            
     {/* Textes de profil */}
-    <View className="ml-3 flex-1 justify-center">
-        {/* <Text
-        style={{ color: theme.textPrimary }}
-        className="text-lg font-bold tracking-wide"
-        numberOfLines={1}
+    <View className="ml-3 flex-1 justify-center"> 
+        <Text 
+        style={{ color: theme.textSecondary }} 
+        className="font-medium text-[10px] mt-0.5"
         >
-        Hey, {user?.prenom || 'U'}  {user?.nom || 'U'}  👋
-        </Text> */}  
+            DB :{' '}
+                    <Text
+                        style={{ color: theme.textSecondary }}
+                        className="font-base text-[10px] text-blue-500">
+                {user?.nomDb || 'DB'}
+            </Text>        
+        </Text>
+
         <Text 
         style={{ color: theme.textSecondary }} 
         className="font-medium text-[10px] mt-0.5"
@@ -62,8 +68,8 @@ return (
                         className="font-base text-[10px] text-blue-500">
                 {user?.phone || '+243 --- --- ---'}
             </Text>        
-            </Text>
-                
+        </Text>
+
         <Text 
         style={{ color: theme.textSecondary }} 
         className="font-medium text-[10px] mt-0.5"
@@ -75,18 +81,20 @@ return (
                 {user?.email || ''}
             </Text>        
         </Text>
+                
         <Text 
         style={{ color: theme.textSecondary }} 
         className="font-base text-[10px] mt-0.5"
         >
         Rôle :{' '}
-                    <Text
+                <Text
                         style={{ color: theme.textSecondary }}
                         className="font-medium text-blue-500">
             {user?.role || 'Non défini'}
+            </Text>
         </Text>
-        </Text>
-    </View>
+        
+        </View>
     </View>
     {/* Bouton Option / Profil (Facultatif) */}
     <TouchableOpacity
