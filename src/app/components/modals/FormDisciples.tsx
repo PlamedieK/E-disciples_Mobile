@@ -1,11 +1,13 @@
+import { BibleSharingType } from "@/constants/Colors";
 import { useAuth, UserRole } from "@/Context/AuthContext";
 import { useTheme } from "@/Context/ThemeContext";
 import { searhPartageBiblique } from "@/services/appelApi";
+import { createDisciple, defaultpsw } from "@/services/Disciple";
 import { Picker } from "@react-native-picker/picker";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import { useEffect, useState } from "react";
 import {
-  Alert,
+  ActivityIndicator,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -17,6 +19,7 @@ import {
 } from "react-native";
 import InputTextLabel from "../Input";
 import InputDateLabel from "../InputDateLabel";
+import AutoCompleteCard from "./AutoCompleteCard";
 
 type FormDisciplesProps = {
   modalVisible: boolean;
@@ -28,41 +31,89 @@ const FormDisciples = ({
   setModalVisible,
 }: FormDisciplesProps) => {
   const { theme } = useTheme();
+  const { ip, token } = useAuth();
+
+  // États du formulaire
   const [nom, setNom] = useState("");
   const [prenom, setPrenom] = useState("");
+  const [selectedIdDb, setSelectedIdDb] = useState<string | number | null>(
+    null,
+  );
   const [email, setEmail] = useState("");
-  const [dateBirthDay, setDateBirthDay] = useState(new Date());
-  //const [selectedDb, setSelectedDb] = useState('')
-  const { ip, token } = useAuth();
+  const password = defaultpsw;
+  const passwordConfirmed = defaultpsw;
+  const [dateBaptism, setDateBaptism] = useState<Date | null>(null);
+
+  // Correction 1 : selectedRole est une valeur unique (ou vide), pas un tableau
+  const [selectedRole, setSelectedRole] = useState<UserRole | "">("");
+
+  // Recherche & Autocomplétion
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
-  const [resultatQuery, setResultatQuery] = useState<any[] | null>([]);
-  const [selectedRole, setSelectedRole] = useState<UserRole[]>([]);
+  const [isLoadingCreate, setIsLoadingCreate] = useState(false);
+  const [resultatQuery, setResultatQuery] = useState<BibleSharingType[]>([]);
 
-  useEffect(() => {
-    searhPartageBiblique({
-      searchQuery,
-      setIsLoading,
-      setResultatQuery,
-      ip,
-      token,
-    });
-  }, [searchQuery, setIsLoading, setResultatQuery, ip, token]);
-
-  const handleSave = () => {
-    if (!nom.trim() || !prenom.trim()) {
-      Alert.alert(
-        "Champs requis",
-        "Veuillez remplir au moins le nom et le prénom.",
-      );
-      return;
+  // 1. Handler pour la saisie : reinitialise immédiatement la liste si < 2 caractères
+  const handleSearchChange = (text: string) => {
+    setSearchQuery(text);
+    setSelectedIdDb(null);
+    if (text.trim().length < 2) {
+      setResultatQuery([]);
     }
-    // Réinitialisation et fermeture
+  };
+
+  // 2. useEffect sans setState synchrone : gère uniquement l'anti-rebond (debounce) d'appel API
+  useEffect(() => {
+    if (searchQuery.trim().length < 2) return;
+    const delayDebounceFn = setTimeout(() => {
+      searhPartageBiblique({
+        searchQuery,
+        setIsLoading,
+        setResultatQuery,
+        ip,
+        token,
+      });
+    }, 400);
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, ip, token]);
+
+  const clearZone = () => {
     setNom("");
     setPrenom("");
     setEmail("");
+    setDateBaptism(new Date());
+    setSearchQuery("");
+    setResultatQuery([]);
+    setSelectedRole("");
+    setSelectedIdDb(null);
+  };
+
+  const handleSave = () => {
+    // if (!nom.trim() || !prenom.trim() || !selectedIdDb) {
+    //   Alert.alert(
+    //     "Champs requis",
+    //     `Veuillez remplir au moins le nom et le prénom. ${selectedIdDb} `,
+    //   );
+    //   return;
+    // }
+    createDisciple({
+      ip,
+      token,
+      selectedIdDb,
+      nom,
+      prenom,
+      email,
+      password,
+      passwordConfirmed,
+      selectedRole,
+      dateBaptism: dateBaptism ?? undefined, // Convertit null en undefined
+      setIsLoadingCreate,
+    });
+    // Réinitialisation et fermeture
+    clearZone();
     setModalVisible(false);
   };
+
   return (
     <Modal
       transparent={true}
@@ -89,13 +140,11 @@ const FormDisciples = ({
             }}
             className="rounded-t-3xl border-t-2 p-6 max-h-[85%]"
           >
-            {/* Le ScrollView entoure uniquement le contenu intérieur */}
             <ScrollView showsVerticalScrollIndicator={false}>
               {/* Poignée d'indicateur */}
               <View className="items-center mb-3">
                 <View className="w-12 h-1.5 bg-slate-700 rounded-full" />
               </View>
-
               {/* En-tête de la Modal */}
               <View className="flex-row justify-between items-center mb-5 pb-3 border-b border-slate-800">
                 <Text
@@ -104,16 +153,20 @@ const FormDisciples = ({
                 >
                   Nouveau Disciple{" "}
                   <Ionicons
-                    name={"person-add"}
+                    name="person-add"
                     size={26}
                     style={{ color: theme.textPrimary }}
                   />
                 </Text>
-                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <TouchableOpacity
+                  onPress={() => {
+                    clearZone();
+                    setModalVisible(false);
+                  }}
+                >
                   <Ionicons name="close-circle" size={26} color="#64748B" />
                 </TouchableOpacity>
               </View>
-
               {/* Formulaire */}
               <View className="space-y-4">
                 <InputTextLabel
@@ -136,15 +189,34 @@ const FormDisciples = ({
                   isPassword={false}
                 />
 
-                <InputTextLabel
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                  placeholder="Recherche..."
-                  textLabel="Partage Biblique"
-                  placeholderColor="#94A3B8"
-                  keyboardType="default"
-                  isPassword={false}
-                />
+                {/* Champ Partage Biblique avec Autocomplétion */}
+                <View className="relative z-50">
+                  <InputTextLabel
+                    value={searchQuery}
+                    onChangeText={handleSearchChange}
+                    placeholder="Recherche..."
+                    textLabel="Partage Biblique"
+                    placeholderColor="#94A3B8"
+                    keyboardType="default"
+                    isPassword={false}
+                  />
+
+                  {/* Dynamic rendering sécurisé sans l'opérateur non-null (!) */}
+                  {resultatQuery && resultatQuery.length > 0 && (
+                    <AutoCompleteCard
+                      data={resultatQuery.map((item) => ({
+                        id: item.id,
+                        nameDb: item.nameDb,
+                      }))}
+                      isLoading={isLoading}
+                      onSelect={(item) => {
+                        setSearchQuery(item.nameDb);
+                        setSelectedIdDb(item.id);
+                        setResultatQuery([]);
+                      }}
+                    />
+                  )}
+                </View>
 
                 <InputTextLabel
                   value={email}
@@ -155,12 +227,14 @@ const FormDisciples = ({
                   keyboardType="email-address"
                   isPassword={false}
                 />
+
                 <Text
                   style={{ color: theme.textPrimary }}
-                  className="text-base text-white py-1.5"
+                  className="text-base py-1.5"
                 >
-                  Role
+                  Rôle
                 </Text>
+
                 <View
                   style={[
                     styles.container,
@@ -170,8 +244,6 @@ const FormDisciples = ({
                     },
                   ]}
                 >
-                  {/* <ListDeroulant /> */}
-
                   <Picker
                     selectedValue={selectedRole}
                     onValueChange={(itemValue) => setSelectedRole(itemValue)}
@@ -181,6 +253,14 @@ const FormDisciples = ({
                       backgroundColor: "transparent",
                     }}
                   >
+                    <Picker.Item
+                      style={{
+                        color: theme.textPrimary,
+                        backgroundColor: theme.background,
+                      }}
+                      label="Sélectionner un rôle..."
+                      value=""
+                    />
                     {Object.values(UserRole).map((role) => (
                       <Picker.Item
                         key={role}
@@ -189,27 +269,36 @@ const FormDisciples = ({
                         style={{
                           color: theme.textPrimary,
                           backgroundColor: theme.background,
-                          borderRadius: 100,
                         }}
                       />
                     ))}
                   </Picker>
                 </View>
+
                 <InputDateLabel
-                  value={dateBirthDay}
-                  onChange={setDateBirthDay}
+                  value={dateBaptism}
+                  onChange={setDateBaptism}
                   textLabel="Date Bapteme"
                 />
               </View>
               {/* Bouton d'action */}
               <TouchableOpacity
                 activeOpacity={0.8}
+                disabled={isLoadingCreate}
                 onPress={handleSave}
-                className="bg-blue-600 p-4 rounded-xl items-center justify-center mt-6 shadow-md shadow-blue-500/30"
+                className={`bg-blue-600 p-4 rounded-xl items-center justify-center mt-6 shadow-md shadow-blue-500/30
+                     ${
+                       isLoadingCreate ?
+                         `${theme.buttonDisabled} border-slate-300`
+                       : `${theme.background} active:bg-blue-[#1e293b]`
+                     }`}
               >
-                <Text className="text-white font-bold text-base">
-                  Enregistrer
-                </Text>
+                {isLoadingCreate ?
+                  <ActivityIndicator size={20} color={"#ffffff"} />
+                : <Text className="text-white font-bold text-base">
+                    Enregistrer
+                  </Text>
+                }
               </TouchableOpacity>
             </ScrollView>
           </TouchableOpacity>

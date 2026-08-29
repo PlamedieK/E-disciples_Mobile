@@ -1,4 +1,4 @@
-import { UserRole } from "@/Context/AuthContext";
+//import { UserRole } from "@/Context/AuthContext";
 
 export const Colors = {
   // Couleurs de marque (Invariables)
@@ -43,28 +43,34 @@ export const Colors = {
   },
 };
 
-export type DisciplesType = {
+export type UserRole = "user" | "admin" | "diri_db";
+
+export type DiscipleType = {
   id: string;
   name: string;
-  username: string | null;
   prename: string;
-  isFall: boolean;
-  role: UserRole;
-  dateBaptism: string;
+  username: string | null;
   email: string;
   phone: string | null;
+  role: UserRole;
+  isFall: boolean;
   dbId: number;
+  dateBaptism: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
+
 export type BibleSharingType = {
   id: number;
+  nameDb: string;
   day: string;
   hour: string;
   site: string;
   diriId: string;
-  nameDb: string;
-  disciples: DisciplesType[];
+  disciples: DiscipleType[];
+  createdAt?: string;
+  updatedAt?: string;
 };
-
 // [
 //   {
 //     "id": 2,
