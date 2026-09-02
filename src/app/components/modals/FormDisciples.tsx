@@ -8,6 +8,7 @@ import Ionicons from "@react-native-vector-icons/ionicons";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -89,26 +90,29 @@ const FormDisciples = ({
   };
 
   const handleSave = () => {
-    // if (!nom.trim() || !prenom.trim() || !selectedIdDb) {
-    //   Alert.alert(
-    //     "Champs requis",
-    //     `Veuillez remplir au moins le nom et le prénom. ${selectedIdDb} `,
-    //   );
-    //   return;
-    // }
-    createDisciple({
-      ip,
-      token,
-      selectedIdDb,
-      nom,
-      prenom,
-      email,
-      password,
-      passwordConfirmed,
-      selectedRole,
-      dateBaptism: dateBaptism ?? undefined, // Convertit null en undefined
-      setIsLoadingCreate,
-    });
+    Alert.alert("Avertissement", "Voulez-vous enregister ?", [
+      {
+        text: "Valider",
+        onPress: () =>
+          createDisciple({
+            ip,
+            token,
+            selectedIdDb,
+            nom,
+            prenom,
+            email,
+            password,
+            passwordConfirmed,
+            selectedRole,
+            dateBaptism: dateBaptism ?? undefined, // Convertit null en undefined
+            setIsLoadingCreate,
+          }),
+      }, {
+        text: "Annuler",
+        //onPress: () => setModalVisible(false)
+        style: 'default'
+      }
+    ]);
     // Réinitialisation et fermeture
     clearZone();
     setModalVisible(false);
@@ -163,8 +167,9 @@ const FormDisciples = ({
                     clearZone();
                     setModalVisible(false);
                   }}
+                  
                 >
-                  <Ionicons name="close-circle" size={26} color="#64748B" />
+                  <Ionicons name="close-circle" size={28} style={{ color: theme.textPrimary }} />
                 </TouchableOpacity>
               </View>
               {/* Formulaire */}

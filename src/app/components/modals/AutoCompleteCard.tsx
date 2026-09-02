@@ -15,7 +15,7 @@
 //   subtitle?: string;
 // };
 
-import { BibleSharingType, DiscipleType } from "@/constants/Colors";
+import {  DiscipleType } from "@/constants/Colors";
 import { useTheme } from "@/Context/ThemeContext";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import {
@@ -59,7 +59,7 @@ const AutoCompleteCard = ({
           borderColor: theme.border,
         },
       ]}
-      className="absolute left-0 right-6 top-[100%] z-50 mt-1 max-h-48 rounded-xl border shadow-lg"
+      className="absolute left-0 right-6 top-[100%] z-50 mt-1 max-h-48 w-full rounded-xl border shadow-lg"
     >
       <ScrollView
         nestedScrollEnabled={true}
