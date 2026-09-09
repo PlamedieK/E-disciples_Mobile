@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -21,6 +22,7 @@ import {
 import InputTextLabel from "../Input";
 import InputDateLabel from "../InputDateLabel";
 import AutoCompleteCard from "./AutoCompleteCard";
+import PhotoPicker from "../PhotoPicker";
 
 type FormDisciplesProps = {
   modalVisible: boolean;
@@ -44,6 +46,7 @@ const FormDisciples = ({
   const password = defaultpsw;
   const passwordConfirmed = defaultpsw;
   const [dateBaptism, setDateBaptism] = useState<Date | null>(null);
+  const [photoUri, setPhotoUri] = useState<string | null>(null)
 
   // Correction 1 : selectedRole est une valeur unique (ou vide), pas un tableau
   const [selectedRole, setSelectedRole] = useState<UserRole | "">("");
@@ -87,6 +90,7 @@ const FormDisciples = ({
     setResultatQuery([]);
     setSelectedRole("");
     setSelectedIdDb(null);
+    setPhotoUri(null)
   };
 
   const handleSave = () => {
@@ -110,7 +114,7 @@ const FormDisciples = ({
       }, {
         text: "Annuler",
         //onPress: () => setModalVisible(false)
-        style: 'default'
+        style: 'cancel'
       }
     ]);
     // Réinitialisation et fermeture
@@ -172,8 +176,13 @@ const FormDisciples = ({
                   <Ionicons name="close-circle" size={28} style={{ color: theme.textPrimary }} />
                 </TouchableOpacity>
               </View>
+
               {/* Formulaire */}
               <View className="space-y-4">
+
+                <View>
+                  <PhotoPicker photoUri={photoUri} onSelectPhoto={setPhotoUri} />
+                </View>
                 <InputTextLabel
                   value={nom}
                   onChangeText={setNom}

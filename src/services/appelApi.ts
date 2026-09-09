@@ -170,6 +170,60 @@ export const loadActivities = async ({
   }
 };
 
+type SearchDiscipleProps = {
+  ip: string | null;
+  token: string | null;
+  searchQuery: string;
+  value?: string | number;
+  setNomDisciple?: (prename: string | null, nom: string | null) => void;
+  setResultatQuery: (tab: any) => void;
+  setIsLoading: (load: boolean) => void;
+};
+export const searchDisciple = async ({
+  ip,
+  token,
+  searchQuery,
+  setResultatQuery,
+  setIsLoading,
+}: SearchDiscipleProps) => {
+  if (!searchQuery || searchQuery.length < 2) {
+    setResultatQuery([]);
+    return;
+  }
+  setIsLoading(true);
+  const url = `http://${ip}:3333/api/search-disciples?q=${encodeURIComponent(searchQuery)}`;
+  try {
+    const ctlr = new AbortController();
+    const timeoutId = setTimeout(() => ctlr.abort(), 6000);
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      signal: ctlr.signal,
+    });
+    clearTimeout(timeoutId);
+    if (!res.ok) {
+      if (res.status === 401) {
+        throw new Error("Session expirée ou non autorisée (401) ");
+      }
+      throw new Error(`Erreur du server HTTP ${res.status} `);
+    }
+    const data = await res.json();
+    console.log("Les disciples... : ", JSON.stringify(data, null, 2));
+    setResultatQuery(data);
+  } catch (error: any) {
+    Alert.alert(
+      "Attention ⚠️",
+      error.message || "Impossible de charger les DBs du serveur",
+    );
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 type searhPartageBibliqueType = {
   searchQuery: string;
   setNameDb?: (name: any) => void;
@@ -224,7 +278,6 @@ export const searhPartageBiblique = async ({
     setIsLoading(false);
   }
 };
-
 
 // export const handleLoginMobile = async ({
 //   ip,
