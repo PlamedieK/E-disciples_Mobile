@@ -149,3 +149,36 @@ export type BibleSharingType = {
 //     ]
 //   }
 // ]
+
+
+
+
+
+// [
+//   {
+//     "id": "76c3880a-8273-4628-9bce-b92b0030ba86",
+//     "name": "KIMPAMBUDI",
+//     "username": "@plams",
+//     "prename": "Plamedie",
+//     "isFall": false,
+//     "role": "diri_db",
+//     "dbId": 5,
+//     "dateBaptism": "2021-10-15T00:00:00.000+00:00",
+//     "createdAt": "2026-04-22T01:21:07.521+00:00",
+//     "updatedAt": "2026-06-24T01:24:31.670+00:00",
+//     "email": "pkimpambudi@gmail.com",
+//     "phone": "0826124836",
+//     "otp": 882877,
+//     "otpExpiredAt": "2026-05-26T21:29:46.084+00:00",
+//     "bibleSharing": {
+//       "id": 5,
+//       "day": "Mardi",
+//       "hour": "15:00:00",
+//       "site": "Haut commandement",
+//       "diriId": "001d1cdc-7dc5-4876-ab85-fc860356d0a8",
+//       "createdAt": "2026-04-21T13:57:56.848+00:00",
+//       "updatedAt": "2026-05-23T16:20:05.206+00:00",
+//       "nameDb": "Mson de France"
+//     }
+//   }
+// ]

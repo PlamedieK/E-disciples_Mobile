@@ -21,7 +21,7 @@ import {
 } from "react-native";
 import InputTextLabel from "../Input";
 import InputDateLabel from "../InputDateLabel";
-import AutoCompleteCard from "./AutoCompleteCard";
+import AutoCompleteCard, { AutoCompleteItem } from "./AutoCompleteCard";
 import PhotoPicker from "../PhotoPicker";
 
 type FormDisciplesProps = {
@@ -40,7 +40,7 @@ const FormDisciples = ({
   const [nom, setNom] = useState("");
   const [prenom, setPrenom] = useState("");
   const [selectedIdDb, setSelectedIdDb] = useState<string | number | null>(
-    null,
+    null
   );
   const [email, setEmail] = useState("");
   const password = defaultpsw;
@@ -65,7 +65,11 @@ const FormDisciples = ({
       setResultatQuery([]);
     }
   };
-
+  const handleSelectDisciple = (item: AutoCompleteItem) => {
+  setSearchQuery(item.nameDb);
+  setSelectedIdDb(item.id);
+  setResultatQuery([]);
+}
   // 2. useEffect sans setState synchrone : gère uniquement l'anti-rebond (debounce) d'appel API
   useEffect(() => {
     if (searchQuery.trim().length < 2) return;
@@ -92,7 +96,6 @@ const FormDisciples = ({
     setSelectedIdDb(null);
     setPhotoUri(null)
   };
-
   const handleSave = () => {
     Alert.alert("Avertissement", "Voulez-vous enregister ?", [
       {
@@ -137,7 +140,7 @@ const FormDisciples = ({
         <TouchableOpacity
           activeOpacity={1}
           onPress={() => setModalVisible(false)}
-          className="flex-1 bg-black/60 justify-end"
+          className="justify-end flex-1 bg-black/60"
         >
           {/* Conteneur de la carte modale (Bottom Sheet) */}
           <TouchableOpacity
@@ -154,7 +157,7 @@ const FormDisciples = ({
                 <View className="w-12 h-1.5 bg-slate-700 rounded-full" />
               </View>
               {/* En-tête de la Modal */}
-              <View className="flex-row justify-between items-center mb-5 pb-3 border-b border-slate-800">
+              <View className="flex-row items-center justify-between pb-3 mb-5 border-b border-slate-800">
                 <Text
                   style={{ color: theme.textPrimary }}
                   className="text-xl font-bold tracking-wide"
@@ -216,18 +219,11 @@ const FormDisciples = ({
                   />
 
                   {/* Dynamic rendering sécurisé sans l'opérateur non-null (!) */}
-                  {resultatQuery && resultatQuery.length > 0 && (
+                  {resultatQuery.length > 0 && (
                     <AutoCompleteCard
-                      data={resultatQuery.map((item) => ({
-                        id: item.id,
-                        nameDb: item.nameDb,
-                      }))}
+                      data={resultatQuery}
                       isLoading={isLoading}
-                      onSelect={(item) => {
-                        setSearchQuery(item.nameDb);
-                        setSelectedIdDb(item.id);
-                        setResultatQuery([]);
-                      }}
+                      onSelect={handleSelectDisciple}
                     />
                   )}
                 </View>
@@ -309,7 +305,7 @@ const FormDisciples = ({
               >
                 {isLoadingCreate ?
                   <ActivityIndicator size={20} color={"#ffffff"} />
-                : <Text className="text-white font-bold text-base">
+                : <Text className="text-base font-bold text-white">
                     Enregistrer
                   </Text>
                 }

@@ -26,7 +26,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-type AutoCompleteItem = {
+export type AutoCompleteItem = {
     id: number;
     day?: string;
     hour?: string;
@@ -67,7 +67,7 @@ const AutoCompleteCard = ({
         showsHorizontalScrollIndicator={true}
       >
         {isLoading ?
-          <View className="p-4 items-center">
+          <View className="items-center p-4">
             <ActivityIndicator color={theme.formColor} size={24} />
             <Text
               style={{ color: theme.textPrimary }}

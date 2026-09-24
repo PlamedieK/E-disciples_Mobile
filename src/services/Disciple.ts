@@ -55,8 +55,11 @@ export const createDisciple = async ({
     }
 
     const payload = {
-      name: nom.trim(),
-      prename: prenom.trim(),
+      name: nom.trim().toLocaleUpperCase(),
+      // ✅ Garde tout le prénom avec la première lettre en majuscule
+      prename:
+        prenom.trim().charAt(0).toUpperCase() +
+        prenom.trim().slice(1).toLowerCase(),
       email: email.trim(),
       password,
       passwordConfirmed,
