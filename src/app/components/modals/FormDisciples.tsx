@@ -97,9 +97,9 @@ const FormDisciples = ({
     setPhotoUri(null)
   };
   const handleSave = () => {
-    Alert.alert("Avertissement", "Voulez-vous enregister ?", [
+    Alert.alert("Avertissement ⚠️", "Voulez-vous enregister ?", [
       {
-        text: "Valider",
+        text: "Oui ✅",
         onPress: () =>
           createDisciple({
             ip,
@@ -115,7 +115,7 @@ const FormDisciples = ({
             setIsLoadingCreate,
           }),
       }, {
-        text: "Annuler",
+        text: "Non❌",
         //onPress: () => setModalVisible(false)
         style: 'cancel'
       }

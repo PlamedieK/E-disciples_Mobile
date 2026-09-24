@@ -9,16 +9,48 @@ const MenuOptions = () => {
     const { user } = useAuth()
     const { theme } = useTheme()
     //const { theme } = useTheme()
-    const actions = useMemo(() => [
-    { id: '1', title: 'Statistiques', icon: 'bar-chart-outline', color: '#3B82F6', route: '/components/pages/Statistiques' },
-    ...(user?.role === 'diri_ministere' ? [{ id: '2', title: 'Créer Disciple', icon: 'person-add-outline', color: '#10B981', route: '/components/pages/Disciples' }] : []),
-    { id: '3', title: 'Créer DB', icon: 'book-outline', color: '#F59E0B', route: '/components/pages/PartageBiblique' },
-    { id: '4', title: 'Études', icon: 'school-outline', color: '#8B5CF6', route: '/components/pages/Etudes' },
-    ], [user])
+    const actions = useMemo(
+      () => [
+        ...(user?.role !== "user" ? [ {
+          id: "1",
+          title: "Statistiques",
+          icon: "bar-chart-outline",
+          color: "#3B82F6",
+          route: "/components/pages/Statistiques",
+        }] : []),
+       
+        ...(user?.role === "diri_ministere" ?
+          [
+            {
+              id: "2",
+              title: "Créer Disciple",
+              icon: "person-add-outline",
+              color: "#10B981",
+              route: "/components/pages/Disciples",
+            },
+          ]
+        : []),
+        {
+          id: "3",
+          title: "Créer DB",
+          icon: "book-outline",
+          color: "#F59E0B",
+          route: "/components/pages/PartageBiblique",
+        },
+        {
+          id: "4",
+          title: "Études",
+          icon: "school-outline",
+          color: "#8B5CF6",
+          route: "/components/pages/Etudes",
+        },
+      ],
+      [user],
+    );
 return (
 <View>
                 
-        <View className="flex-row flex-wrap justify-between gap-y-4 px-1 mb-6">
+        <View className="flex-row flex-wrap justify-between px-1 mb-6 gap-y-4">
             {actions.map((item) => (
             <TouchableOpacity
                 key={item.id}
@@ -36,13 +68,13 @@ return (
             >
                 <View
                 style={{ backgroundColor: `${item.color}1E` }}
-                className="w-12 h-12 rounded-xl items-center justify-center"
+                className="items-center justify-center w-12 h-12 rounded-xl"
                 >
                 <Ionicons name={item.icon as any} size={24} color={item.color} />
                 </View>
                 <Text
                 style={{ color: theme.textPrimary || '#FFFFFF' }}
-                className="text-sm font-bold text-center tracking-wide"
+                className="text-sm font-bold tracking-wide text-center"
                 >
                 {item.title}
                 </Text>

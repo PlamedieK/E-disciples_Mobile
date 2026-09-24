@@ -56,7 +56,7 @@ const PhotoPicker = ({ photoUri, onSelectPhoto, title }: PhotoPickerProps) => {
       "Choisissez une option",
       [
         // { text: "Photo", onPress: takeWithCamera },
-        { text: "Galerie", onPress: pickFromGallery },
+        { text: "Galerie 📷", onPress: pickFromGallery },
         photoUri ?
           {
             text: "Supprimer la photo",
@@ -77,7 +77,7 @@ const PhotoPicker = ({ photoUri, onSelectPhoto, title }: PhotoPickerProps) => {
       <Pressable
         onPress={showOptions}
         style={{ backgroundColor: theme.background, borderColor: theme.border }}
-        className="w-28 h-28 rounded-full items-center justify-center border-2 overflow-hidden relative"
+        className="relative items-center justify-center overflow-hidden border-2 rounded-full w-28 h-28"
       >
         {photoUri ?
           <Image source={{ uri: photoUri }} className="w-full h-full" />
@@ -97,8 +97,8 @@ const PhotoPicker = ({ photoUri, onSelectPhoto, title }: PhotoPickerProps) => {
           onPress={() => onSelectPhoto(null)}
           className="mt-2 bg-red-500/20 px-3 py-1.5 rounded-full "
         >
-          <View className="items-center flex-row gap-2 p-2">
-            <Text className="text-red-400 text-xs font-semibold">Annuler</Text>
+          <View className="flex-row items-center gap-2 p-2">
+            <Text className="text-xs font-semibold text-red-400">Annuler</Text>
             <Ionicons size={14} name={"trash-outline"} color={"#ce5555"} />
           </View>
         </Pressable>

@@ -45,7 +45,7 @@ const Statistiques = () => {
   const [tabActivities, setTabActivities] = useState<ActivitiesType[]>([]);
   const [isLoadingActivities, setIsLoadingActivities] = useState(true);
   const [formData, setFormData] = useState<ActivityFormState>({});
-  const [isSubmittting, setIsSubmtting] = useState(false);
+  const [isSubmitting, setIsSubmtting] = useState(false);
 
   // Chargement initial des activités
   useEffect(() => {
@@ -134,18 +134,18 @@ const Statistiques = () => {
     //   { text: "OK", onPress: () => console.log("OK Pressed") },
     // ]);
     const payload = formatPayloadForApi();
-    console.log(payload);
+    //console.log(payload);
     Alert.alert(
-      "Avertissement",
-      `Voulez-vous vraiment confirmer pour le Fr ${selectedDisciple.prename} ${selectedDisciple.name}`,
+      "Avertissement ⚠️",
+      `Voulez-vous vraiment confirmer les statistiques  pour le Fr ${selectedDisciple.prename} ${selectedDisciple.name}`,
       [
         {
-          text: "Cancel",
+          text: "Non ❌",
           style: "cancel",
-          //onPress: ()
+          //onPress: 
         },
         {
-          text: "Valider",
+          text: "Oui✅",
           onPress: async () => {
             const result = await saveParticipations({
               ip,
@@ -157,7 +157,7 @@ const Statistiques = () => {
               // Reconstitution/Réinitialisation du formulaire si nécessaire
               setFormData({});
               setSelectedDisciple(null);
-              setSearchQuery('')
+              setSearchQuery("");
             }
           },
         },
@@ -334,24 +334,53 @@ const Statistiques = () => {
                   </View>
                 );
               }}
-              ListFooterComponent={
-                <TouchableOpacity
-                  onPress={handleSubmit}
-                  className="items-center w-full py-4 mt-4 bg-blue-600 shadow-lg rounded-2xl shadow-blue-600/30"
-                >
-                  {isSubmittting ?
-                    <ActivityIndicator color="#FFF" />
-                  : <Text className="text-base font-bold text-white">
-                      Enregistrer les statistiques
+              ListFooterComponent={(() => {
+                // 1. Sécurité : vérification que le tableau n'est pas vide
+                const isOpen =
+                  tabActivities?.length > 0 && tabActivities[0]?.isOpen;
+
+                if (isOpen) {
+                  return (
+                    <TouchableOpacity
+                      disabled={isSubmitting}
+                      onPress={handleSubmit}
+                      activeOpacity={0.8}
+                      className={`items-center justify-center w-full py-4 mt-6 bg-blue-600 rounded-2xl shadow-lg shadow-blue-600/30 ${
+                        isSubmitting ? "opacity-50" : "opacity-100"
+                      }`}
+                    >
+                      {isSubmitting ?
+                        <ActivityIndicator color="#FFFFFF" size="small" />
+                      : <Text className="text-base font-bold text-white">
+                          Enregistrer les statistiques
+                        </Text>
+                      }
+                    </TouchableOpacity>
+                  );
+                }
+
+                return (
+                  <View className="items-center justify-center p-6 mt-6 border bg-amber-500/10 border-amber-500/20 rounded-2xl">
+                    <Ionicons
+                      name="lock-closed-outline"
+                      size={28}
+                      color="#F59E0B"
+                    />
+                    <Text
+                      style={{ color: theme.textSecondary }}
+                      className="mt-2 text-sm font-medium leading-relaxed text-center"
+                    >
+                      La session pour les activités est actuellement fermée.
+                      Veuillez contacter le dirigeant de votre ministère.
                     </Text>
-                  }
-                </TouchableOpacity>
-              }
+                  </View>
+                );
+              })()}
             />
           }
         </View>
-      : <View className="items-center justify-center flex-1 p-6 opacity-60">
-          <Ionicons name="person-circle-outline" size={64} color="#64748B" />
+      : <View className="items-center justify-center flex-1 px-4 y-2 opacity-60">
+          <Ionicons name="person-circle-outline" size={256} color="#64748B" />
           <Text
             style={{ color: theme.textSecondary }}
             className="mt-2 text-sm font-medium text-center"
