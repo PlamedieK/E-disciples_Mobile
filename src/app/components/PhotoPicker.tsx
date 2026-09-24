@@ -31,6 +31,7 @@ const PhotoPicker = ({ photoUri, onSelectPhoto, title }: PhotoPickerProps) => {
   };
 
   //taking capture via camera
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const takeWithCamera = async () => {
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
 
