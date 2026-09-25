@@ -1,84 +1,88 @@
-import { Alert } from "react-native"
-import * as SecureStore from 'expo-secure-store'
+import * as SecureStore from "expo-secure-store";
+import { Alert } from "react-native";
+
 type healthTestProps = {
-    ip: string
-    setIsTesting: (test: boolean) => void
-    //setTabData: (data: any[]) => void;
-}
+  ip: string;
+  setIsTesting: (test: boolean) => void;
+  //setTabData: (data: any[]) => void;
+};
 
 type TypeLogin = {
-  ip: string
-  email: string
-  password: string,
-  prenom?: string,
-  setIsTestingLogin: (load: boolean) => void
-  onSuccess: (user: any) => void
-}
-
-
+  ip: string;
+  email: string;
+  password: string;
+  prenom?: string;
+  setIsTestingLogin: (load: boolean) => void;
+  onSuccess: (user: any, ip: any) => void;
+};
 
 export const healthTest = async ({ ip, setIsTesting }: healthTestProps) => {
-    const cleanIp = ip.trim()
-    if (!cleanIp) {
-      Alert.alert('Attention ⚠️', 'Veuillez saisir une adresse IP valide.')
-      return
-    }
-
-    setIsTesting(true)
-    const url = `http://${cleanIp}:3333/api/testApi`
-    try {
-      // Configuration d'une limite de temps (Timeout) à 6 secondes
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6000)
-      
-      const res = await fetch(url, {
-        method: 'GET', 
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        signal: controller.signal
-      })
-      clearTimeout(timeoutId)
-      const data = await res.json()
-      if (data && data.status === 'connected') {
-        //setTabData(data.tab) 
-        Alert.alert('Succès 🎉', 
-          `Connexion établie avec succès !
-          \nMessage du serveur : ${data.message}`)
-      } else {
-      Alert.alert('Erreur',  'Réponse inattendue du serveur.')
-
-      }
-
-    } catch (error) {
-      console.log(error);
-      Alert.alert(
-        'Échec de connexion ❌',
-        `Impossible de joindre le serveur à l'adresse :\n${url}\n\nVérifiez que :
-        \n1. Votre téléphone et votre PC sont sur le MÊME Wi-Fi.
-        \n2. L'IP saisie est correcte.
-        \n3. Le serveur AdonisJS est actif.`
-      )
-    } finally {
-      setIsTesting(false)
-    }
-}
-  
-
-export const handleLoginMobile = async ({ ip, email, password, onSuccess, prenom, setIsTestingLogin }: TypeLogin) => {
- // const cleanIp = ip.trim()
-  if (!ip || !email || !password) {
-    Alert.alert('Attention ⚠️','Veuillez remplir tous les champs');
+  const cleanIp = ip.trim();
+  if (!cleanIp) {
+    Alert.alert("Attention ⚠️", "Veuillez saisir une adresse IP valide.");
     return;
   }
-  setIsTestingLogin(true)
+  setIsTesting(true);
+  const url = `http://${cleanIp}:3333/api/testApi`;
+  try {
+    // Configuration d'une limite de temps (Timeout) à 6 secondes
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    const data = await res.json();
+    if (data && data.status === "connected") {
+      //setTabData(data.tab)
+      Alert.alert(
+        "Succès 🎉",
+        `Connexion établie avec succès !
+          \nMessage du serveur : ${data.message}`,
+      );
+    } else {
+      Alert.alert("Erreur", "Réponse inattendue du serveur.");
+      // console.log('hlkl', url)
+    }
+  } catch (error) {
+    console.log(error);
+    Alert.alert(
+      "Échec de connexion ❌",
+      `Impossible de joindre le serveur à l'adresse :\n${url}\n\nVérifiez que :
+        \n1. Votre téléphone et votre PC sont sur le MÊME Wi-Fi.
+        \n2. L'IP saisie est correcte.
+        \n3. Le serveur AdonisJS est actif.`,
+    );
+  } finally {
+    setIsTesting(false);
+  }
+};
+
+export const handleLoginMobile = async ({
+  ip,
+  email,
+  password,
+  onSuccess,
+  prenom,
+  setIsTestingLogin,
+}: TypeLogin) => {
+  // const cleanIp = ip.trim()
+  if (!ip || !email || !password) {
+    Alert.alert("Attention ⚠️", "Veuillez remplir tous les champs");
+    return;
+  }
+  setIsTestingLogin(true);
   try {
     const response = await fetch(`http://${ip.trim()}:3333/api/api-login`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
       body: JSON.stringify({ email, password }),
     });
@@ -87,46 +91,190 @@ export const handleLoginMobile = async ({ ip, email, password, onSuccess, prenom
     const data = await response.json().catch(() => null);
 
     if (!response.ok) {
-      console.log('Status HTTP :', response.status);
-      console.log('Réponse complète AdonisJS :', data);
-      const errorMessage = data?.message || `Erreur serveur (Code ${response.status})`;
+      // console.log("Status HTTP :", response.status);
+      // console.log("Réponse complète AdonisJS :", data);
+      const errorMessage =
+        data?.message || `Erreur serveur (Code ${response.status})`;
       throw new Error(errorMessage);
     }
 
     if (!data || !data.token) {
-      throw new Error('Réponse invalide du serveur (token manquant)');
+      throw new Error("Réponse invalide du serveur (token manquant)");
     }
 
     // Sauvegarde du token
-    await SecureStore.setItemAsync('user_token', data.token);
+    await SecureStore.setItemAsync("user_token", data.token);
 
     alert(`Connexion réussie ! ${data.user!.nom!}-${data.user!.prenom!} 🎉`);
-    onSuccess(data.user);
+    onSuccess(data.user, ip);
   } catch (error: any) {
-    // Affichage détaillé de l'erreur dans la console Metro
-   // console.error('[Login Error Details] :', error);
-    alert(error.message || 'Impossible de joindre le serveur');
+    Alert.alert("Attention ⚠️", error.message);
   } finally {
     setIsTestingLogin(false);
   }
+};
+export interface ActivitiesType {
+  id: number;
+  activity: string;
+  isOpen: boolean;
 }
 
+type LoadActivitiesProps = {
+  setActivities: (tab: ActivitiesType[]) => void;
+  ip: string | null;
+  token?: string | null;
+};
+export const loadActivities = async ({
+  setActivities,
+  ip,
+  token,
+}: LoadActivitiesProps) => {
+  if (!ip) {
+    Alert.alert("Attention ⚠️", "L'adresse IP du serveur est introuvable");
+    return;
+  }
+  const apis = `http://${ip.trim()}:3333/api/activities-api`;
+  try {
+    const ctlr = new AbortController();
+    const timeoutId = setTimeout(() => ctlr.abort(), 3000);
+    const res = await fetch(apis, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        // Ajout du token d'authentification Bearer
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      signal: ctlr.signal,
+    });
+    clearTimeout(timeoutId);
+    if (!res.ok) {
+      if (res.status === 401) {
+        throw new Error("Session expirée ou non autorisée (401)");
+      }
+      throw new Error(`Erreur serveur HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    // Correction 2 : pour afficher un objet ou tableau JSON dans la console
+    console.log("Les activités :", JSON.stringify(data, null, 2));
+    // Mise à jour du state avec les données reçues
+    setActivities(data);
+  } catch (error: any) {
+    Alert.alert(
+      "Attention ⚠️",
+      error.message || "Impossible de charger les activités du serveur",
+    );
+  }
+};
 
+type SearchDiscipleProps = {
+  ip: string | null;
+  token: string | null;
+  searchQuery: string;
+  value?: string | number;
+  setNomDisciple?: (prename: string | null, nom: string | null) => void;
+  setResultatQuery: (tab: any) => void;
+  setIsLoading: (load: boolean) => void;
+};
+export const searchDisciple = async ({
+  ip,
+  token,
+  searchQuery,
+  setResultatQuery,
+  setIsLoading,
+}: SearchDiscipleProps) => {
+  if (!searchQuery || searchQuery.length < 2) {
+    setResultatQuery([]);
+    return;
+  }
+  setIsLoading(true);
+  const url = `http://${ip}:3333/api/search-disciples?q=${encodeURIComponent(searchQuery)}`;
+  try {
+    const ctlr = new AbortController();
+    const timeoutId = setTimeout(() => ctlr.abort(), 6000);
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      signal: ctlr.signal,
+    });
+    clearTimeout(timeoutId);
+    if (!res.ok) {
+      if (res.status === 401) {
+        throw new Error("Session expirée ou non autorisée (401) ");
+      }
+      throw new Error(`Erreur du server HTTP ${res.status} `);
+    }
+    const data = await res.json();
+    console.log("Les disciples... : ", JSON.stringify(data, null, 2));
+    setResultatQuery(data);
+  } catch (error: any) {
+    Alert.alert(
+      "Attention ⚠️",
+      error.message || "Impossible de charger les DBs du serveur",
+    );
+  } finally {
+    setIsLoading(false);
+  }
+};
 
-// export type UserData = {
-//   id?: number
-//   email: string
-//   nom?: string
-//   prenom?: string
-// }
+type searhPartageBibliqueType = {
+  searchQuery: string;
+  setNameDb?: (name: any) => void;
+  value?: string | number;
+  setIsLoading: (name: boolean) => void;
+  setResultatQuery: (tab: any) => void;
+  ip: string | null;
+  token?: string | null;
+};
+export const searhPartageBiblique = async ({
+  searchQuery,
+  setIsLoading,
+  setResultatQuery,
+  ip,
+  token,
+}: searhPartageBibliqueType) => {
+  if (!searchQuery || searchQuery.length < 2) {
+    setResultatQuery([]);
+    return;
+  }
 
-// type LoginParams = {
-//   ip: string
-//   email: string
-//   password: string
-//   setIsTestingLogin: (loading: boolean) => void
-//   onSuccess: (user: UserData) => void
-// }
+  setIsLoading(true);
+  const url = `http://${ip}:3333/api/search-db?q=${encodeURIComponent(searchQuery)}`;
+  try {
+    const ctlr = new AbortController();
+    const timeoutId = setTimeout(() => ctlr.abort(), 6000);
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        ...(token ? { Authorization: `Bearer ${token} ` } : {}),
+      },
+      signal: ctlr.signal,
+    });
+    clearTimeout(timeoutId);
+    if (!res.ok) {
+      if (res.status === 401) {
+        throw new Error("Session expirée ou non autorisée (401)");
+      }
+      throw new Error(`Erreur du server HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    console.log("Les partages bibliques", JSON.stringify(data, null, 2));
+    setResultatQuery(data);
+  } catch (error: any) {
+    Alert.alert(
+      "Attention ⚠️",
+      error.message || "Impossible de charger les DBs du serveur",
+    );
+  } finally {
+    setIsLoading(false);
+  }
+};
 
 // export const handleLoginMobile = async ({
 //   ip,
@@ -142,18 +290,9 @@ export const handleLoginMobile = async ({ ip, email, password, onSuccess, prenom
 //     )
 //     return
 //   }
-
 //   setIsTestingLogin(true)
-
 //   const url = `http://${ip.trim()}:3333/api/api-login`
-
 //   try {
-//     console.log('================================')
-//     console.log('🔐 LOGIN MOBILE')
-//     console.log('URL:', url)
-//     console.log('EMAIL:', email)
-//     console.log('================================')
-
 //     const response = await fetch(url, {
 //       method: 'POST',
 //       headers: {
@@ -174,7 +313,6 @@ export const handleLoginMobile = async ({ ip, email, password, onSuccess, prenom
 
 //     // IMPORTANT : on lit la réponse brute
 //     const rawResponse = await response.text()
-
 
 // console.log('📡 STATUS:', response.status)
 // console.log('📡 CONTENT-TYPE:', response.headers.get('content-type'))
