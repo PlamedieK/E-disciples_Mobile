@@ -91,8 +91,8 @@ export const handleLoginMobile = async ({
     const data = await response.json().catch(() => null);
 
     if (!response.ok) {
-      console.log("Status HTTP :", response.status);
-      console.log("Réponse complète AdonisJS :", data);
+      // console.log("Status HTTP :", response.status);
+      // console.log("Réponse complète AdonisJS :", data);
       const errorMessage =
         data?.message || `Erreur serveur (Code ${response.status})`;
       throw new Error(errorMessage);
@@ -108,10 +108,7 @@ export const handleLoginMobile = async ({
     alert(`Connexion réussie ! ${data.user!.nom!}-${data.user!.prenom!} 🎉`);
     onSuccess(data.user, ip);
   } catch (error: any) {
-    Alert.alert(
-      error.message || "Attention ⚠️",
-      "Impossible de joindre le serveur",
-    );
+    Alert.alert("Attention ⚠️", error.message);
   } finally {
     setIsTestingLogin(false);
   }
